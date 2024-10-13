@@ -2,7 +2,6 @@
 name: Build Static Image
 on:
   push:
-    branches: ['main']
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: 'pentool-hq/pentool-da'
