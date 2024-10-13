@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "pentool-da-baseline"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = {extras = ["standard"], version = "^0.115.2"}
+pandas = "^2.2.3"
+numpy = "^2.1.2"
+plotly = "^5.24.1"
+tabulate = "^0.9.0"
+requests = "^2.32.3"
+uvicorn = {extras = ["standard"], version = "^0.31.1"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
