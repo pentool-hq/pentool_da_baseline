@@ -1,15 +1,14 @@
 from typing import Any, Dict, List
 
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-
 from scripts.asset_retriever import AssetRetriever
 from scripts.config import load_config
 from scripts.data_acquisition import DataAcquisition, clean_transaction_data
 from scripts.yt_calculation import YTCalculation
 
-app = FastAPI()
+router = APIRouter()
 
 config = load_config()
 
@@ -100,11 +99,11 @@ def main_logic():
         "underlying_amount": underlying_amount
     }
 
-@app.get("/full_data", response_model=FullResponse)
+@router.get("/full_data", response_model=FullResponse)
 def get_full_data():
     result = main_logic()
     return result
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(router, host="0.0.0.0", port=8000)
