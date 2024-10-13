@@ -1,6 +1,6 @@
 services:
   frontend:
-    container_name: frontend
+    container_name: pentool_da
     image: ghcr.io/pentool-hq/pentool_da_baseline:latest
     ports:
-      - 3000:3000
+      - 3000:8000
