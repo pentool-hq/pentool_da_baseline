@@ -1,2 +1,5 @@
 [phases.setup]
 nixPkgs = ["python312", "gcc"]
+
+[start]
+cmd = "poetry run fastapi run main.py"
