@@ -1,9 +1,10 @@
+# scripts/config.py
+
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from datetime import datetime, timezone
 import random
-
 
 # Dictionary of network IDs
 NETWORK_IDS = {
@@ -11,40 +12,6 @@ NETWORK_IDS = {
     'ethereum': '/1',
     'mantle': '/5000'
 }
-
-
-def init_session():
-    """
-    Initializes a session with retry capabilities to handle common HTTP errors.
-
-    :return: A session object with retry logic enabled.
-    """
-    session = requests.Session()
-    retry_strategy = Retry(
-        total=3,  # Total number of retry attempts
-        backoff_factor=1,  # Time between retries
-        status_forcelist=[429, 500, 502, 503, 504],  # Status codes to trigger retries
-        allowed_methods=["GET"]
-    )
-    adapter = HTTPAdapter(max_retries=retry_strategy)
-    session.mount("https://", adapter)
-    session.mount("http://", adapter)
-    return session
-
-
-def get_network_id(network):
-    """
-    Retrieves the corresponding network ID for a given network name.
-
-    :param network: Name of the blockchain network ('arbitrum', 'ethereum', 'mantle').
-    :return: Network ID as a string.
-    :raises ValueError: If the network is not supported.
-    """
-    network_id = NETWORK_IDS.get(network.lower())
-    if network_id is None:
-        raise ValueError("Invalid network: must be 'arbitrum', 'ethereum', or 'mantle'")
-    return network_id
-
 
 # Default configuration parameters
 DEFAULT_CONFIG = {
@@ -66,9 +33,46 @@ DEFAULT_CONFIG = {
     'headers': {
         "User-Agent": f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                       f"AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{random.randint(80, 100)}.0.{random.randint(1000, 2000)}.0 Safari/537.36"
-    }
+    },
+
+    # Selection parameters
+    'BUY_YT': False,
+    'SELL_YT': True,
+    'BUY_PT': False,
+    'SELL_PT': False,
+    'YT_OR_PT_AMOUNT': 0.01
 }
 
+def init_session():
+    """
+    Initializes a session with retry capabilities to handle common HTTP errors.
+
+    :return: A session object with retry logic enabled.
+    """
+    session = requests.Session()
+    retry_strategy = Retry(
+        total=3,  # Total number of retry attempts
+        backoff_factor=1,  # Time between retries
+        status_forcelist=[429, 500, 502, 503, 504],  # Status codes to trigger retries
+        allowed_methods=["GET"]
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    return session
+
+def get_network_id(network):
+    """
+    Retrieves the corresponding network ID for a given network name.
+
+    :param network: Name of the blockchain network ('arbitrum', 'ethereum', 'mantle').
+    :return: Network ID as a string.
+    :raises ValueError: If the network is not supported.
+    """
+    network_id = NETWORK_IDS.get(network.lower())
+    if network_id is None:
+        raise ValueError("Invalid network: must be 'arbitrum', 'ethereum', or 'mantle'")
+    return network_id
 
 def format_start_time(start_time_str):
     """
@@ -79,7 +83,6 @@ def format_start_time(start_time_str):
     """
     datetime_obj = datetime.strptime(start_time_str, '%Y-%m-%d %H:%M:%S')
     return datetime_obj.replace(tzinfo=timezone.utc).isoformat(timespec='milliseconds').replace('+00:00', 'Z')
-
 
 def load_config(custom_config=None):
     """
@@ -100,6 +103,19 @@ def load_config(custom_config=None):
     
     return config
 
+def validate_selection(buy_yt=False, sell_yt=False, buy_pt=False, sell_pt=False):
+    """
+    Validate that exactly one option is selected.
+    """
+    selected_options = [buy_yt, sell_yt, buy_pt, sell_pt]
+    if sum(selected_options) != 1:
+        raise ValueError("Please select exactly one option.")
+    if buy_yt or sell_pt:
+        return 0  # BUY
+    elif buy_pt or sell_yt:
+        return 1  # SELL
+    else:
+        raise ValueError("Invalid selection configuration.")
 
 # Test block for the config script
 if __name__ == "__main__":
@@ -108,7 +124,11 @@ if __name__ == "__main__":
         'network': 'arbitrum',
         'market_contract': '0xNewMarketContract',
         'yt_contract': '0xNewYTContract',
-        'start_time': "2022-06-01 00:00:00"
+        'start_time': "2022-06-01 00:00:00",
+        'BUY_YT': True,
+        'SELL_YT': False,
+        'BUY_PT': False,
+        'SELL_PT': False
     }
 
     # Load the config with overrides
