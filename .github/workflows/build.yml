@@ -4,7 +4,7 @@ on:
   push:
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: 'pentool-hq/pentool-da'
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
 
 jobs:
   amd64:
