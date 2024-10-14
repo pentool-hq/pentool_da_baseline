@@ -1,4 +1,3 @@
-<<<<<<<< HEAD:api.py
 # api.py
 
 from fastapi import FastAPI, HTTPException
@@ -6,18 +5,17 @@ from pydantic import BaseModel
 from typing import List, Dict, Any
 import pandas as pd
 
-========
+
 from typing import Any, Dict, List
 
 import pandas as pd
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
->>>>>>>> 9f5d27ac7aa3f8c23031a480da1f3b8013503c8c:routers/strategy1_api.py
 from scripts.asset_retriever import AssetRetriever
 from scripts.config import load_config
 from scripts.data_acquisition import DataAcquisition, clean_transaction_data
 from scripts.yt_calculation import YTCalculation
-<<<<<<<< HEAD:api.py
+
 from scripts.config import load_config
 from scripts.transaction_order_prediction import waiting_time
 
@@ -26,10 +24,10 @@ app = FastAPI(
     description="API for fetching data and predicting order arrival times based on transaction data.",
     version="1.0.0"
 )
-========
+
 
 router = APIRouter()
->>>>>>>> 9f5d27ac7aa3f8c23031a480da1f3b8013503c8c:routers/strategy1_api.py
+
 
 config = load_config()
 
