@@ -1,33 +1,17 @@
-# api.py
+# routers/api.py
 
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import List, Dict, Any
 import pandas as pd
 
-
-from typing import Any, Dict, List
-
-import pandas as pd
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
 from scripts.asset_retriever import AssetRetriever
 from scripts.config import load_config
 from scripts.data_acquisition import DataAcquisition, clean_transaction_data
 from scripts.yt_calculation import YTCalculation
-
-from scripts.config import load_config
 from scripts.transaction_order_prediction import waiting_time
 
-app = FastAPI(
-    title="Pendle YT Timing Strategy Analyzer API",
-    description="API for fetching data and predicting order arrival times based on transaction data.",
-    version="1.0.0"
-)
-
-
 router = APIRouter()
-
 
 config = load_config()
 
@@ -141,44 +125,29 @@ def get_full_data():
 
     :return: FullResponse object.
     """
-    try:
-        result = fetch_full_data()
-        return result
-    except HTTPException as he:
-        raise he
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    result = fetch_full_data()
+    return result
 
-@app.api_route("/predict_order_time", methods=["GET", "POST"], response_model=CombinedResponse)
+@router.api_route("/predict_order_time", methods=["GET", "POST"], response_model=CombinedResponse)
 def predict_order_time():
     """
     GET and POST endpoint to fetch full data and return prediction results.
 
     :return: CombinedResponse object containing full data and prediction.
     """
-    try:
-        # Fetch full data
-        full_data = fetch_full_data()
+    # Fetch full data
+    full_data = fetch_full_data()
 
-        # Convert the full_data's df_cleaned_transactions to DataFrame
-        df_tran_cleaned = pd.DataFrame(full_data.df_cleaned_transactions)
+    # Convert the full_data's df_cleaned_transactions to DataFrame
+    df_tran_cleaned = pd.DataFrame(full_data.df_cleaned_transactions)
 
-        # Call the prediction function
-        prediction = waiting_time(df_tran_cleaned)
+    # Call the prediction function
+    prediction = waiting_time(df_tran_cleaned)
 
-        # Create CombinedResponse
-        combined_response = CombinedResponse(
-            full_data=full_data,
-            prediction=PredictionResult(**prediction)
-        )
+    # Create CombinedResponse
+    combined_response = CombinedResponse(
+        full_data=full_data,
+        prediction=PredictionResult(**prediction)
+    )
 
-        return combined_response
-
-    except HTTPException as he:
-        raise he
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(router, host="0.0.0.0", port=8000)
+    return combined_response
